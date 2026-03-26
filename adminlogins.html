@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login - Church</title>
+  <!-- ✅ Flask way -->
+<link rel="stylesheet" href="{{ url_for('static', filename='2chweb.css') }}">
+  <style>
+    body { font-family: Arial; background: #f5f6fa; text-align: center; padding-top: 50px; }
+    form { background: white; padding: 20px; border-radius: 10px; display: inline-block; }
+    input { margin: 10px; padding: 10px; width: 200px; border: 1px solid #ccc; border-radius: 6px; }
+    button { background: #007BFF; color: white; border: none; padding: 10px 20px; border-radius: 6px; }
+    button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h2>🔑 Admin Login</h2>
+  
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for msg in messages %}
+        <p style="color:red;">{{ msg }}</p>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST">
+    <input type="text" name="username" placeholder="Username" required><br>
+    <input type="password" name="password" placeholder="Password" required><br>
+    <button type="submit">Login</button>
+  </form>
+</body>
+</html>

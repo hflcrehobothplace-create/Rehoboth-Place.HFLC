@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="2chweb.css">
+   <style>
+       /* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+nav a.active {
+  color: #007BFF;
+  font-weight: 600;
+  border-bottom: 2px solid #007BFF;
+  padding-bottom: 4px;
+}
+
+/* BASE STYLES */
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #002B5B;
+  background-color: #ffffff;
+  scroll-behavior: smooth;
+}
+
+h1, h2 {
+  color: #003366;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* HEADER */
+/*  header {
+  background-color: #f5f9ff;
+  padding: 1rem 2rem;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+} */
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/*  .logo {
+  width: 80px;
+  height: auto;
+} */
+
+/* NAVIGATION */
+nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  gap: 20px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #003366;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #007BFF;
+}
+
+/* HERO SECTION */
+.hero {
+  background: linear-gradient(135deg, #007bff, #66a6ff);
+  color: white;
+  text-align: center;
+  padding: 120px 20px;
+  position: relative;
+  overflow: hidden;
+  
+}
+
+.hero h2 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.btn {
+  background-color: #fff;
+  color: #007bff;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  align: center;
+ 
+}
+
+.btn:hover {
+  background-color: #0056b3;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* SECTIONS */
+section {
+  padding: 60px 20px;
+  max-width: 900px;
+  margin: auto;
+ 
+}
+
+.about, .sermons, .info, .connect, .contact {
+  background: #f8fbff;
+  border-radius: 16px;
+  padding: 40px 20px;
+  margin-top: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  align: center;
+}
+
+/* FORM */
+.connect form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.connect input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.connect button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.connect button:hover {
+  background-color: #0056b3;
+}
+
+/* FOOTER */
+footer {
+  background-color: #002B5B;
+  color: white;
+  text-align: center;
+  padding: 20px 10px;
+  margin-top: 40px;
+}
+
+.social-icons {
+  margin-bottom: 10px;
+}
+
+.social-icons a img {
+  width: 24px;
+  margin: 0 8px;
+  transition: transform 0.3s ease;
+}
+
+.social-icons a:hover img {
+  transform: scale(1.2);
+}
+
+/* ANIMATIONS */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+}
+
+.slide-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideUp 1.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .hero h2 {
+    font-size: 1.8rem;
+  }
+
+  nav ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    align: center;
+  }
+}
+/*   header {
+  background-color: #f5f9ff;
+  padding: 1rem 2rem;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  /* position: fixed; */
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+} */
+
+body {
+  padding-top: 0px; /* To avoid header overlapping */
+}
+#backToTop {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 22px;
+  cursor: pointer;
+  display: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.3s;
+  z-index: 1001;
+}
+
+#backToTop:hover {
+  background-color: #0056b3;
+  transform: scale(1.1);
+}
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
+}
+
+/* .scroll-animate.visible {
+  opacity: 1;
+  transform: translateY(0); */
+}
+footer {
+  background: linear-gradient(135deg, #002B5B, #004a9f);
+  color: white;
+  text-align: center;
+  padding: 25px 10px;
+  margin-top: 40px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+}
+/* .scroll-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
+}
+
+/*  .scroll-animate.visible {
+  opacity: 1;
+  transform: translateY(0); */
+}
+nav a.active {
+  color: #007BFF;
+  font-weight: 600;
+  border-bottom: 2px solid #007BFF;
+  padding-bottom: 4px;
+}
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
+}
+
+.scroll-animate.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+nav a.active {
+  color: #007BFF;
+  font-weight: 600;
+  border-bottom: 2px solid #007BFF;
+  padding-bottom: 4px;
+}
+
+/* BASE STYLES */
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #002B5B;
+  background-color: #ffffff;
+  scroll-behavior: smooth;
+}
+
+h1, h2 {
+  color: #003366;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* HEADER */
+header {
+  background-color: #f5f9ff;
+ /*   padding: 1rem 2rem; */
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/*  .logo {
+  width: 80px;
+  height: auto;
+} */
+
+/* NAVIGATION */
+nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  gap: 20px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #003366;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #007BFF;
+}
+
+/* HERO SECTION */
+.hero {
+  background: linear-gradient(135deg, #007bff, #66a6ff);
+  color: white;
+  text-align: center;
+  padding: 120px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero h2 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.btn {
+  background-color: #fff;
+  color: #007bff;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  align: center;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* SECTIONS */
+section {
+  padding: 60px 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.about, .sermons, .info, .connect, .contact {
+  background: #f8fbff;
+  border-radius: 16px;
+  padding: 40px 20px;
+  margin-top: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  
+}
+
+/* FORM */
+.connect form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.connect input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.connect button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.connect button:hover {
+  background-color: #0056b3;
+}
+
+/* FOOTER */
+footer {
+  background-color: #002B5B;
+  color: white;
+  text-align: center;
+  padding: 20px 10px;
+  margin-top: 40px;
+}
+
+.social-icons {
+  margin-bottom: 10px;
+}
+
+.social-icons a img {
+  width: 24px;
+  margin: 0 8px;
+  transition: transform 0.3s ease;
+}
+
+.social-icons a:hover img {
+  transform: scale(1.2);
+}
+
+
+
+
+/* ANIMATIONS */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+}
+
+.slide-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideUp 5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .hero h2 {
+    font-size: 1.8rem;
+  }
+
+  nav ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    align:center;
+  }
+}
+ header {
+  background-color: #f5f9ff;
+  /*  padding: 1rem 2rem; */
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: ;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+} 
+body {
+  padding-top: 25px; /* To avoid header overlapping */
+}
+#backToTop {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 22px;
+  cursor: pointer;
+  display: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.3s;
+  z-index: 1001;
+}
+
+#backToTop:hover {
+  background-color: #0056b3;
+  transform: scale(1.1);
+}
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
+}
+
+ .scroll-animate.visible {
+  opacity: 1;
+  transform: translateY(0); 
+}
+footer {
+  background: linear-gradient(135deg, #002B5B, #004a9f);
+  color: white;
+  text-align: center;
+  
+/*thus caused a problem because there a space between  "#" and "padding" (it was blank on the runned page) so you know it was fixed by just playing a song in my head while rereading the code*/
+
+#padding: 25px 10px;
+  margin-top: 40px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+}
+ .scroll-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
+}
+
+ .scroll-animate.visible {
+  opacity: 1;
+  transform: translateY(0); 
+}
+nav a.active {
+  color: #007BFF;
+  font-weight: 600;
+  border-bottom: 2px solid #007BFF;
+  padding-bottom: 4px;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  line-height: 1.6rem;
+  margin-top: 6px;
+}
+.logo {
+  width: 110px;            /* slightly larger logo */
+  height: auto;
+  display: block;
+  margin: 0 auto 10px auto; /* centers it and adds tiny space below */
+  border-radius: 6px;       /* optional: soft rounded edges */
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);   /* gentle hover zoom effect */
+}
+header {
+  background-color: #f5f9ff;
+  padding: 0rem 2rem 1rem 2rem; /* reduced top padding */
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-top: 0;
+}
+/* 🔒 Admin Button Styling */
+.admin-btn {
+  background-color: #007BFF;
+  color: white !important;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.admin-btn:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+
+/* Bible Search Form */
+.bible-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  margin: 20px auto;
+  gap: 12px;
+}
+
+.bible-form input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.bible-form button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.bible-form button:hover {
+  background-color: #0056b3;
+}
+
+/* Bible Result */
+.bible-result {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 15px;
+  background-color: #f0f8ff;
+  border-left: 4px solid #007bff;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  line-height: 1.5;
+
+  </style>
+  
+  
+  <!-- ✅ Flask way -->
+<link rel="stylesheet" href="2chweb.css">
+<!--<img src="Facebook.jpg"> -->
+<!--<img src="churchlogohflc.jpg"> -->
+
+ <!--<img src="Facebook.jpg">-->
+  <script>
+  // Highlight active navigation link on scroll
+  const sections = document.querySelectorAll("section");
+  const navLinks = document.querySelectorAll("nav a");
+
+  window.addEventListener("scroll", () => {
+    let current = "";
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 100;
+      if (scrollY >= sectionTop) {
+        current = section.getAttribute("id");
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove("active");
+      if (link.getAttribute("href").includes(current)) {
+        link.classList.add("active");
+      }
+    });
+  });
+</script>
+  <title>Holyghost Family Life Centre Inc.</title>
+  <link rel="stylesheet" href="2chweb.css">
+
+  <!-- ✅ Link your CSS -->
+  <link rel="stylesheet" href="2chweb.css" />
+
+  <!-- ✅ Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="fade-in">
+    <div class="logo-container">
+      <!-- 🕊️ Replace logo.png with your real logo file -->
+      <img src="churchlogohflc.jpg" alt="Holyghost Family Life Centre Logo" class="logo" />
+      
+      <h1>HOLYGHOST FAMILY LIFE CENTRE <br><br>(rehoboth place )INC.<br></h1>
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#sermons">Sermons</a></li>
+        <li><a href="#contact">Contact Us</a></li>
+        <!-- about the admin panel, also it will be investigated on more tomorrow being the 22nd of October 2025-->
+      <li><a href="adminlogins.html" class="admin-btn">Admin Panel</a></li>
+ <!--      
+   {% if session.get('admin_logged_in') %}
+<li><a href="adminlogins.html" class="admin-btn">Admin Panel</a></li>
+{% endif %}  
+      </ul>
+    </nav> -->
+    
+  </header>
+<!-- <section id="about" class="scroll-animate">
+  ...hero slide-up
+</section> -->
+</section>
+  <!-- HERO SECTION -->
+ <section id="home" class="slide-up" style="background-color:#f8fbff">
+    <div class="hero-content">
+      <h2>Welcome to Holyghost Family Life Centre Inc.</h2>
+      <p>Experience God’s Presence, Power, and Purpose.</p>
+      <a href="#about" class="btn" >Learn More</a>
+    </div>
+  </section>
+  
+  <section id="testimonies" class="slide-up" style="background-color:#f8fbff">
+  <h2>Testimonies & Bible Inspiration</h2>
+  <div class="testimony">
+    <p>“With God all things are possible.” — Matthew 19:26</p>
+  </div>
+  <div class="testimony">
+    <p>“The peace of God that surpasses all understanding has filled my home through this ministry.”</p>
+  </div>
+  <div class="testimony">
+    <p>“I received my healing during one of the Sunday services. Glory to God!”</p>
+  </div>
+</section>
+<audio id="bgTone" loop>
+  <source src="soft-tone.mp3" type="audio/mpeg">
+</audio>
+
+<!--  <button  id="soundToggle" title="Toggle Sound">sound</button> -->
+  <!-- ABOUT US -->
+  <section id="about" class="about fade-in">
+    <h2>About Us</h2>
+    <p>
+      Holyghost Family Life Centre Inc. is a place where lives are transformed through the Word,
+      worship, and the presence of the Holy Spirit. We are committed to helping families grow in faith,
+      love, and purpose through Christ Jesus.
+    </p>
+    <p>
+      Our mission is to reach the world with the gospel, restore broken lives, and raise champions for the Kingdom.
+    </p>
+  </section>
+
+  <!-- SERMONS -->
+  <section id="sermons" class="sermons fade-in">
+    <h2>Our Sermons</h2>
+   <p>tap the Facebook icon to view the sermon in Facebook.</p> <p><a href="https://www.facebook.com/hflc.inc"> <img src="facebook.jpg" alt="Facebook" width="50px"></a>
+      <!-- You can insert your sermon video link, Facebook livestream link, or text content here -->
+      Stay tuned for powerful messages that will uplift your spirit and draw you closer to God.
+    </p>
+  </section>
+
+  <!-- CHURCH INFORMATION -->
+  <section id="info" class="info fade-in">
+    <h2>Church Information</h2>
+    <!-- 📝 Add description, service -->
+    <p>Sunday Service – 8:00am |<br> Bible Study – Wednesday 5:30pm |<br><br><br>Location: 👇🚦Behind World Bank Market, Close to Ideal Suite Junction </p>
+  </section>
+
+  <!-- STAY CONNECTED FORM -->
+  <section id="connect" class="connect slide-up">
+    <h2>Stay Connected</h2>
+    <form action="/submit-signup" method="POST">
+      <input type="text" name="fullname" placeholder="Full Name" required>
+      <input type="email" name="email" placeholder="Email Address" required>
+      <input type="tel" name="phone" placeholder="Phone Number" required>
+      <button type="submit" class="btn">Submit</button>
+    </form>
+  </section>
+
+  <!-- CONTACT US -->
+  <section id="contact" class="contact fade-in">
+    <h2>Contact Us</h2>
+    <p><strong>📞 Phone:</strong> 08037507990, 08102573487</p><br>
+    <p><strong>📍 Address:</strong> 
+ Behind World Bank Market,within 100 meters from Ideal Suite Junction. WORLD BANK .OWERRI . IMO STATE.  NIGERIA.</p>
+  </section>
+ <!--   <a href="#backToTop"><button>backtotop</button></a> -->
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<!--<script>
+  const bgTone = document.getElementById("bgTone");
+  const soundToggle = document.getElementById("soundToggle");
+  let soundOn = false;
+
+  soundToggle.addEventListener("click", () => {
+    if (soundOn) {
+      bgTone.pause();
+      soundToggle.textContent = "🔊";
+    } else {
+      bgTone.play();
+      soundToggle.textContent = "🔇";
+    }
+    soundOn = !soundOn;
+  });
+</script>
+ -->
+ 
+ 
+ 
+ {% extends "index.html" %} <!-- Optional if you want to keep header/footer from your main site -->
+
+{% block content %}
+<section id="bible-search" class="about fade-in">
+  <h2>Bible Verse Search (KJV)</h2>
+
+  <!-- Search Form -->
+  <form action="/bible-search" method="POST" class="bible-form">
+    <input type="text" name="verse" placeholder="Enter verse (e.g., John 3:16)" required>
+    <button type="submit" class="btn">Search</button>
+  </form>
+
+  <!-- Display Result or Error -->
+  <div class="bible-result">
+    {% if verse_text %}
+      <p><strong>Verse:</strong> {{ verse_text }}</p>
+    {% elif error %}
+      <p style="color:red;">{{ error }}</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+<a href="/bible-search">Bible Verse Search</a>
+
+
+
+
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="social-icons">
+      <a href="https://www.facebook.com/hflc.inc"><img src="facebook.jpg" alt="Facebook"></a>
+    <!--  <a href="#"><img src="icons/instagram.svg" alt="Instagram"></a>
+      <a href="#"><img src="icons/youtube.svg" alt="YouTube"></a> -->
+    </div>
+    <p>© 2025 Holyghost Family Life Centre Inc. | All Rights Reserved</p>
+  </footer>
+</body>
+</html>
