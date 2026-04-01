@@ -1,7 +1,7 @@
 # ==============================================
 # app.py — Flask Backend for Church Website + Admin Panel
 # ==============================================
-pip install twilio sendgrid
+# pip install twilio sendgrid
 # Twilio for SMS
 from twilio.rest import Client
 
