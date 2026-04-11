@@ -14,8 +14,10 @@ from sendgrid.helpers.mail import Mail
 # ------------------------------------------
 # INITIALIZE APP
 # ------------------------------------------
+
 app = Flask(__name__)
 app.secret_key = "supersecretchurchkey"
+
 
 # ------------------------------------------
 # DATABASE SETUP
@@ -35,7 +37,9 @@ def init_db():
     conn.commit()
     conn.close()
 
-init_db()
+with app.app_context():
+    init_db()
+
 
 # ------------------------------------------
 # ROUTE 1: Homepage
