@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bible Search – HFLC</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='2chweb.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-container">
+      <img src="{{ url_for('static', filename='churchlogohflc.jpg') }}" alt="HFLC Logo" class="logo" />
+      <h1>HOLYGHOST FAMILY LIFE CENTRE<br>(Rehoboth Place) INC.</h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/#about">About Us</a></li>
+        <li><a href="/#sermons">Sermons</a></li>
+        <li><a href="/#contact">Contact Us</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- BIBLE SEARCH SECTION -->
+  <section id="bible-search" class="about fade-in">
+    <h2>📖 Bible Verse Search (KJV)</h2>
+
+    <!-- Search Form -->
+    <form action="/bible-search" method="POST" class="bible-form">
+      <input type="text" name="verse" placeholder="Enter verse e.g. John 3:16 or Psalm 23" required>
+      <button type="submit" class="btn">Search</button>
+    </form>
+
+    <!-- Result Display -->
+    {% if verse_text %}
+      <div class="bible-result">
+        <p><strong>📌 {{ verse_ref }}</strong></p>
+        <p style="margin-top:10px; font-style:italic; line-height:1.8;">{{ verse_text }}</p>
+      </div>
+    {% elif error %}
+      <div class="bible-result" style="border-left-color: red;">
+        <p style="color:red;">⚠️ {{ error }}</p>
+      </div>
+    {% endif %}
+
+    <div style="text-align:center; margin-top:20px;">
+      <a href="/" class="btn" style="display:inline-block; text-decoration:none;">← Back to Home</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Holyghost Family Life Centre Inc. | All Rights Reserved</p>
+  </footer>
+
+</body>
+</html>
 
