@@ -4,22 +4,18 @@
 # ==============================================
 
 import requests
-import psycopg2  # OLD: import sqlite3
+import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, request, redirect, flash, session, url_for
-from twilio.rest import Client
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 
 # ------------------------------------------
 # INITIALIZE APP
 # ------------------------------------------
-
 app = Flask(__name__)
-
-# OLD: app.secret_key = "supersecretchurchkey"
-# NEW: Secret key is now pulled from Render settings for security
 app.secret_key = os.environ.get("FLASK_KEY", "fallback-key-for-local-testing")
 
 
@@ -28,7 +24,6 @@ app.secret_key = os.environ.get("FLASK_KEY", "fallback-key-for-local-testing")
 # ------------------------------------------
 def get_db_connection():
     """Connects to the external PostgreSQL database."""
-    # This URL will come from Neon.tech or Supabase
     db_url = os.environ.get("DATABASE_URL")
     return psycopg2.connect(db_url)
 
@@ -36,8 +31,6 @@ def init_db():
     """Creates the table if it doesn't exist (Postgres syntax)."""
     conn = get_db_connection()
     cursor = conn.cursor()
-    # OLD: id INTEGER PRIMARY KEY AUTOINCREMENT
-    # NEW: id SERIAL PRIMARY KEY (Postgres way)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS signups (
             id SERIAL PRIMARY KEY,
@@ -76,8 +69,6 @@ def submit_signup():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    # OLD: VALUES (?, ?, ?)
-    # NEW: VALUES (%s, %s, %s) (Postgres uses %s)
     cursor.execute('''
         INSERT INTO signups (full_name, email, phone)
         VALUES (%s, %s, %s)
@@ -90,7 +81,7 @@ def submit_signup():
     return redirect('/')
 
 # ------------------------------------------
-# ROUTE 3: Bible Verse Search (No changes needed, logic was perfect)
+# ROUTE 3: Bible Verse Search
 # ------------------------------------------
 @app.route('/bible-search', methods=['GET', 'POST'])
 def bible_search():
@@ -125,8 +116,6 @@ def bible_search():
 # ------------------------------------------
 # ROUTE 4: Admin Login
 # ------------------------------------------
-# OLD: Hardcoded username/password
-# NEW: Pulled from Render Environment Variables
 ADMIN_USERNAME = os.environ.get("ADMIN_USER")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASS")
 
@@ -173,7 +162,7 @@ def logout():
     return redirect('/')
 
 # ------------------------------------------
-# ROUTE 7: Send Announcements
+# ROUTE 7: Send Announcements via Gmail
 # ------------------------------------------
 @app.route('/send-message', methods=['POST'])
 def send_message():
@@ -181,45 +170,79 @@ def send_message():
         flash("Unauthorized. Please log in as admin.")
         return redirect(url_for('admin_login'))
 
-    TWILIO_SID = os.environ.get("TWILIO_SID", "")
-    TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN", "")
-    TWILIO_PHONE = os.environ.get("TWILIO_PHONE", "")
-    SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
-    FROM_EMAIL = os.environ.get("FROM_EMAIL", "")
+    # Gmail credentials from Render environment variables
+    GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
+    GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
-    announcement = request.form.get('announcement', 'Greetings from HFLC!')
+    announcement = request.form.get('announcement', 'Greetings from Holyghost Family Life Centre!')
 
+    if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
+        flash("Email not configured. Please set GMAIL_ADDRESS and GMAIL_APP_PASSWORD in Render environment variables.")
+        return redirect(url_for('admin_dashboard'))
+
+    # Get all signups from database
     conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT email, phone FROM signups")
+    c.execute("SELECT full_name, email FROM signups")
     contacts = c.fetchall()
     c.close()
     conn.close()
 
-    sms_sent = 0
+    if not contacts:
+        flash("No contacts found in the database yet.")
+        return redirect(url_for('admin_dashboard'))
+
     email_sent = 0
+    email_failed = 0
 
-    for email, phone in contacts:
-        if phone and TWILIO_SID:
-            try:
-                client = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
-                client.messages.create(body=announcement, from_=TWILIO_PHONE, to=phone)
-                sms_sent += 1
-            except Exception as e:
-                print(f"SMS failed: {e}")
+    try:
+        # Connect to Gmail SMTP server
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
 
-        if email and SENDGRID_API_KEY:
+        for full_name, recipient_email in contacts:
             try:
-                sg = SendGridAPIClient(SENDGRID_API_KEY)
-                msg = Mail(from_email=FROM_EMAIL, to_emails=email, subject="Church Update", plain_text_content=announcement)
-                sg.send(msg)
+                # Build the email
+                msg = MIMEMultipart()
+                msg['From'] = f"Holyghost Family Life Centre <{GMAIL_ADDRESS}>"
+                msg['To'] = recipient_email
+                msg['Subject'] = "Church Announcement - Holyghost Family Life Centre"
+
+                # Email body
+                body = f"""Dear {full_name},
+
+{announcement}
+
+God bless you,
+Holyghost Family Life Centre Inc.
+(Rehoboth Place)
+Owerri, Imo State, Nigeria.
+
+---
+To unsubscribe, reply to this email.
+"""
+                msg.attach(MIMEText(body, 'plain'))
+                server.sendmail(GMAIL_ADDRESS, recipient_email, msg.as_string())
                 email_sent += 1
-            except Exception as e:
-                print(f"Email failed: {e}")
 
-    flash(f"Sent! SMS: {sms_sent}, Emails: {email_sent}")
+            except Exception as e:
+                print(f"Failed to send to {recipient_email}: {e}")
+                email_failed += 1
+
+        server.quit()
+
+    except Exception as e:
+        flash(f"Could not connect to Gmail: {str(e)}")
+        return redirect(url_for('admin_dashboard'))
+
+    flash(f"Announcement sent! Emails delivered: {email_sent}, Failed: {email_failed}")
     return redirect(url_for('admin_dashboard'))
 
+
+# ------------------------------------------
+# RUN APP
+# ------------------------------------------
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
