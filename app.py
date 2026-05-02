@@ -1,5 +1,5 @@
 # ==============================================
-# app.py - UPDATED FOR PRODUCTION
+# app.py - UPDATED FOR PRODUCTION + SECURED
 # Holyghost Family Life Centre Inc.
 # ==============================================
 
@@ -8,16 +8,42 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
 import smtplib
+from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, request, redirect, flash, session, url_for
+from flask_wtf.csrf import CSRFProtect
 
 # ------------------------------------------
 # INITIALIZE APP
 # ------------------------------------------
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_KEY", "fallback-key-for-local-testing")
+app.config['WTF_CSRF_SECRET_KEY'] = os.environ.get("FLASK_KEY", "fallback-key-for-local-testing")
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
+# CSRF Protection
+csrf = CSRFProtect(app)
+
+# ------------------------------------------
+# SESSION TIMEOUT - auto logout after 30 mins
+# ------------------------------------------
+@app.before_request
+def check_session_timeout():
+    if session.get('admin_logged_in'):
+        last_active = session.get('last_active')
+        if last_active:
+            last_active_time = datetime.fromisoformat(last_active)
+            if datetime.now() - last_active_time > timedelta(minutes=30):
+                session.clear()
+                flash("Session expired. Please log in again.")
+                return redirect(url_for('admin_login'))
+        session['last_active'] = datetime.now().isoformat()
+
+# ------------------------------------------
+# LOGIN ATTEMPT TRACKER
+# ------------------------------------------
+login_attempts = {}
 
 # ------------------------------------------
 # DATABASE CONNECTION HELPER
@@ -59,12 +85,23 @@ def home():
 # ------------------------------------------
 @app.route('/submit-signup', methods=['POST'])
 def submit_signup():
-    full_name = request.form.get('fullname')
-    email = request.form.get('email')
-    phone = request.form.get('phone')
+    full_name = request.form.get('fullname', '').strip()
+    email = request.form.get('email', '').strip()
+    phone = request.form.get('phone', '').strip()
 
     if not full_name or not email or not phone:
         flash("Please fill in all fields.")
+        return redirect('/')
+
+    # Input length validation
+    if len(full_name) > 100:
+        flash("Name is too long. Please use a shorter name.")
+        return redirect('/')
+    if len(email) > 150:
+        flash("Email address is too long.")
+        return redirect('/')
+    if len(phone) > 20:
+        flash("Phone number is too long.")
         return redirect('/')
 
     conn = get_db_connection()
@@ -114,23 +151,48 @@ def bible_search():
     return render_template('bible.html', verse_text=verse_text, verse_ref=verse_ref, error=error)
 
 # ------------------------------------------
-# ROUTE 4: Admin Login
+# ROUTE 4: Admin Login (with brute force protection)
 # ------------------------------------------
 ADMIN_USERNAME = os.environ.get("ADMIN_USER")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASS")
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
+    ip = request.remote_addr
+
+    # Check if IP is blocked
+    if ip in login_attempts:
+        attempt = login_attempts[ip]
+        if attempt.get('blocked_until') and datetime.now() < attempt['blocked_until']:
+            minutes_left = int((attempt['blocked_until'] - datetime.now()).seconds / 60) + 1
+            flash(f"Too many failed attempts. Try again in {minutes_left} minute(s).")
+            return render_template('adminlogins.html')
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
 
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            # Successful — clear attempts, set session
+            login_attempts.pop(ip, None)
             session['admin_logged_in'] = True
+            session['last_active'] = datetime.now().isoformat()
+            session.permanent = True
             flash("Welcome, Admin!")
             return redirect(url_for('admin_dashboard'))
         else:
-            flash("Invalid username or password.")
+            # Failed — increment counter
+            if ip not in login_attempts:
+                login_attempts[ip] = {'count': 0, 'blocked_until': None}
+            login_attempts[ip]['count'] += 1
+
+            if login_attempts[ip]['count'] >= 5:
+                login_attempts[ip]['blocked_until'] = datetime.now() + timedelta(minutes=15)
+                login_attempts[ip]['count'] = 0
+                flash("Too many failed attempts. You are blocked for 15 minutes.")
+            else:
+                remaining = 5 - login_attempts[ip]['count']
+                flash(f"Invalid username or password. {remaining} attempt(s) remaining.")
 
     return render_template('adminlogins.html')
 
@@ -157,7 +219,7 @@ def admin_dashboard():
 # ------------------------------------------
 @app.route('/logout')
 def logout():
-    session.pop('admin_logged_in', None)
+    session.clear()
     flash("You have been logged out.")
     return redirect('/')
 
@@ -170,17 +232,20 @@ def send_message():
         flash("Unauthorized. Please log in as admin.")
         return redirect(url_for('admin_login'))
 
-    # Gmail credentials from Render environment variables
     GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
     GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
     announcement = request.form.get('announcement', 'Greetings from Holyghost Family Life Centre!')
 
+    # Announcement length limit
+    if len(announcement) > 2000:
+        flash("Announcement is too long. Keep it under 2000 characters.")
+        return redirect(url_for('admin_dashboard'))
+
     if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
         flash("Email not configured. Please set GMAIL_ADDRESS and GMAIL_APP_PASSWORD in Render environment variables.")
         return redirect(url_for('admin_dashboard'))
 
-    # Get all signups from database
     conn = get_db_connection()
     c = conn.cursor()
     c.execute("SELECT full_name, email FROM signups")
@@ -196,20 +261,17 @@ def send_message():
     email_failed = 0
 
     try:
-        # Connect to Gmail SMTP server
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
 
         for full_name, recipient_email in contacts:
             try:
-                # Build the email
                 msg = MIMEMultipart()
                 msg['From'] = f"Holyghost Family Life Centre <{GMAIL_ADDRESS}>"
                 msg['To'] = recipient_email
                 msg['Subject'] = "Church Announcement - Holyghost Family Life Centre"
 
-                # Email body
                 body = f"""Dear {full_name},
 
 {announcement}
