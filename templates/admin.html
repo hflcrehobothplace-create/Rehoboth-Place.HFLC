@@ -88,6 +88,7 @@
     <h3>📢 Send Announcement to All Members</h3>
     <p>Type your message below and tap Send. Every person who signed up will receive this in their email inbox.</p>
     <form action="/send-message" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <textarea name="announcement" placeholder="Type your church announcement here...
 
 Example:
