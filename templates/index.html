@@ -1380,6 +1380,7 @@ header {
   <section id="connect" class="connect slide-up">
     <h2>Stay Connected</h2>
     <form action="/submit-signup" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input type="text" name="fullname" placeholder="Full Name" required>
       <input type="email" name="email" placeholder="Email Address" required>
       <input type="tel" name="phone" placeholder="Phone Number" required>
@@ -1485,6 +1486,7 @@ Located within 200 meters of Ideal Suite Junction.</p>
 
   <!-- Search Form -->
   <form action="/bible-search" method="POST" class="bible-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="text" name="verse" placeholder="Enter verse (e.g., John 3:16)" required>
     <button type="submit" class="btn">Search</button>
   </form>
