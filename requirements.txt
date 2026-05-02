@@ -4,3 +4,4 @@ gunicorn
 twilio
 sendgrid
 psycopg2-binary
+flask-wtf
